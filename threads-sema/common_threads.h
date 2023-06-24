@@ -39,7 +39,7 @@
   assert(*sem != NULL);
 #define Sem_wait(sem)                                                          \
   assert(dispatch_semaphore_wait(*sem, DISPATCH_TIME_FOREVER) == 0);
-#define Sem_post(sem) assert(dispatch_semaphore_signal(*sem) != 0);
+#define Sem_post(sem) assert(dispatch_semaphore_signal(*sem) >= 0);
 #endif
 
 #endif // __common_threads_h__
