@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,6 +15,10 @@
 
 typedef struct __barrier_t {
     // add semaphores and other information here
+    dispatch_semaphore_t count_s;
+    dispatch_semaphore_t all_thread_called_s;
+    size_t num_threads;
+    size_t count;
 } barrier_t;
 
 
@@ -22,10 +27,21 @@ barrier_t b;
 
 void barrier_init(barrier_t *b, int num_threads) {
     // initialization code goes here
+    Sem_init(&(b->count_s), 1);
+    Sem_init(&(b->all_thread_called_s), 0);
+    b->num_threads = num_threads;
+    b->count = 0;
 }
 
 void barrier(barrier_t *b) {
     // barrier code goes here
+    Sem_wait(&(b->count_s));
+    if (++(b->count) == b->num_threads) {
+        for (size_t i=0; i<b->num_threads; ++i)
+            Sem_post(&(b->all_thread_called_s));
+    }
+    Sem_post(&(b->count_s));
+    Sem_wait(&(b->all_thread_called_s));
 }
 
 //
